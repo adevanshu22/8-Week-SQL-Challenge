@@ -23,12 +23,6 @@
 -- LIMIT 5;
 
 
-SELECT customer_id, order_date, product_name
-FROM dannys_diner.sales
-LEFT JOIN dannys_diner.menu ON sales.product_id = menu.product_id
-GROUP BY customer_id
-ORDER BY order_date
-
 
 -- 1. What is the total amount each customer spent at the restaurant?
 SELECT s.customer_id, SUM(m.price) as total_amount_spent
@@ -48,6 +42,11 @@ FROM
 (SELECT customer_id, MIN(order_date) as first_order_date
 FROM sales 
 GROUP BY 1) as first_order
+
+-- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+
+
 
 
 
