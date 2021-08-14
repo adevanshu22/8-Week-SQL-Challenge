@@ -53,6 +53,40 @@ GROUP BY product_name, sales.product_id
 ORDER BY total_ordered DESC
 LIMIT 1
 
+-- 5. Which item was the most popular for each customer?
+
+SELECT t.customer_id, menu.product_name, no_orders
+FROM
+(SELECT customer_id, product_id, COUNT(*) as no_orders, 
+RANK() OVER (
+	PARTITION BY customer_id
+	ORDER BY COUNT(*) DESC
+) as rank
+FROM sales
+GROUP BY 
+customer_id, product_id) as t 
+JOIN menu
+ON menu.product_id = t.product_id
+WHERE rank = 1
+
+
+-- 6. Which item was purchased first by the customer after they became a member?
+
+SELECT sales.customer_id, menu.product_name, p.date
+FROM 
+(SELECT sales.customer_id, MIN(order_date) as date
+FROM members
+JOIN sales
+ON members.customer_id = sales.customer_id
+WHERE join_date < order_date
+GROUP BY 
+sales.customer_id
+) as p 
+JOIN sales
+ON p.customer_id = sales.customer_id
+AND p.date = sales.order_date
+JOIN menu
+ON sales.product_id = menu.product_id
 
 
 
