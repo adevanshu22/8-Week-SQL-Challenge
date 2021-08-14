@@ -89,8 +89,50 @@ JOIN menu
 ON sales.product_id = menu.product_id
 
 
+-- 7. Which item was purchased just before the customer became a member?
+
+
+SELECT p.customer_id, sales.product_id, p.order_date, menu.product_name
+FROM 
+(SELECT sales.customer_id, MAX(order_date) as order_date
+FROM members
+JOIN sales
+ON members.customer_id = sales.customer_id
+WHERE join_date > order_date
+GROUP BY
+sales.customer_id
+) as p JOIN sales
+ON sales.customer_id = p.customer_id
+AND sales.order_date = p.order_date
+JOIN menu
+ON menu.product_id = sales.product_id
 
 
 
+-- 8. What is the total items and amount spent for each member before they became a member?
+
+SELECT sales.customer_id, COUNT(*) as total_items, SUM(price) as total_amount_spent
+FROM sales
+JOIN members
+ON members.customer_id = sales.customer_id
+JOIN menu
+ON menu.product_id = sales.product_id
+WHERE order_date < join_date
+GROUP BY sales.customer_id
 
 
+
+-- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+SELECT customer_id, SUM(points) as total_points
+FROM 
+(SELECT *,
+CASE
+	WHEN product_name = 'sushi' THEN 20*price
+	ELSE 10*price
+END as points
+FROM sales
+JOIN menu
+ON sales.product_id = menu.product_id) as p
+GROUP BY
+customer_id
