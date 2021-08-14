@@ -45,6 +45,14 @@ GROUP BY 1) as first_order
 
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
+SELECT product_name, sales.product_id, COUNT(*) as total_ordered FROM 
+sales 
+JOIN menu
+ON sales.product_id = menu.product_id
+GROUP BY product_name, sales.product_id
+ORDER BY total_ordered DESC
+LIMIT 1
+
 
 
 
